@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component} from 'react';
 import Game from './Game';
 
-const App = () => {
-  return <Game randomNumberCount={6} />;
-};
-
-export default App;
+export default class App extends Component {
+  render() {
+    return <Game randomNumberCount={6} />;
+  }
+}
