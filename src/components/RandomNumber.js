@@ -11,6 +11,9 @@ export default class RandomNumber extends Component {
   };
 
   handlePress = () => {
+    if (this.props.isDisabled) {
+      return; // Do nothing
+    }
     this.props.onPress(this.props.id);
   };
 

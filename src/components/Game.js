@@ -9,7 +9,7 @@ export default class Game extends Component {
   };
 
   state = {
-    selectedNumbers: [],
+    selectedIds: [],
   };
 
   randomNumbers = Array.from({
@@ -23,26 +23,47 @@ export default class Game extends Component {
   //TODO: Shuffle the random numbers
 
   isNumberSelected = (numberIndex) => {
-    return this.state.selectedNumbers.indexOf(numberIndex) >= 0;
+    return this.state.selectedIds.indexOf(numberIndex) >= 0;
   };
 
   selectNumber = (numberIndex) => {
     this.setState((prevState) => {
-      return {selectedNumbers: [...prevState.selectedNumbers, numberIndex]};
+      return {selectedIds: [...prevState.selectedIds, numberIndex]};
     });
   };
 
+  gameStatus = () => {
+    const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
+      return acc + this.randomNumbers[curr];
+    }, 0);
+
+    if (sumSelected < this.target) {
+      return 'PLAYING';
+    }
+    if (sumSelected === this.target) {
+      return 'WON';
+    }
+    if (sumSelected > this.target) {
+      return 'LOST';
+    }
+  };
+
   render() {
+    const gameStatus = this.gameStatus();
     return (
       <View style={styles.container}>
-        <Text style={styles.target}>{this.target}</Text>
+        <Text style={[styles.target, styles[`STATUS_${gameStatus}`]]}>
+          {this.target}
+        </Text>
         <View style={styles.randomContainer}>
           {this.randomNumbers.map((randomNumber, index) => (
             <RandomNumber
               key={index}
               id={index}
               number={randomNumber}
-              isDisabled={this.isNumberSelected(index)}
+              isDisabled={
+                this.isNumberSelected(index) || this.gameStatus() !== 'PLAYING'
+              }
               onPress={this.selectNumber}
             />
           ))}
@@ -60,7 +81,6 @@ const styles = StyleSheet.create({
   },
   target: {
     fontSize: 50,
-    backgroundColor: '#DCD6F7',
     margin: 50,
     textAlign: 'center',
   },
@@ -69,5 +89,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
+  },
+  STATUS_PLAYING: {
+    backgroundColor: '#DCD6F7',
+  },
+  STATUS_WON: {
+    backgroundColor: '#38E54D',
+  },
+  STATUS_LOST: {
+    backgroundColor: '#E64848',
   },
 });
