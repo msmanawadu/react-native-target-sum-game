@@ -14,6 +14,8 @@ export default class Game extends Component {
     remainingSeconds: this.props.initialSeconds,
   };
 
+  gameStatus = 'PLAYING';
+
   randomNumbers = Array.from({
     length: this.props.randomNumberCount,
   }).map(() => 1 + Math.floor(Math.random() * 10));
@@ -53,7 +55,20 @@ export default class Game extends Component {
     });
   };
 
-  gameStatus = () => {
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
+    if (
+      nextState.selectedIds !== this.state.selectedIds ||
+      nextState.remainingSeconds === 0
+    ) {
+      this.gameStatus = this.calcGameStatus();
+      if (this.gameStatus !== 'PLAYING') {
+        clearInterval(this.intervalId);
+      }
+    }
+  }
+
+  // gameStatus: PLAYING, WON, LOST
+  calcGameStatus = () => {
     const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
       return acc + this.randomNumbers[curr];
     }, 0);
@@ -74,7 +89,7 @@ export default class Game extends Component {
   };
 
   render() {
-    const gameStatus = this.gameStatus();
+    const gameStatus = this.calcGameStatus;
     return (
       <View style={styles.container}>
         <Text style={[styles.target, styles[`STATUS_${gameStatus}`]]}>
@@ -87,7 +102,8 @@ export default class Game extends Component {
               id={index}
               number={randomNumber}
               isDisabled={
-                this.isNumberSelected(index) || this.gameStatus() !== 'PLAYING'
+                this.isNumberSelected(index) ||
+                this.calcGameStatus() !== 'PLAYING'
               }
               onPress={this.selectNumber}
             />
