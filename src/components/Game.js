@@ -6,10 +6,12 @@ import RandomNumber from './RandomNumber';
 export default class Game extends Component {
   static propTypes = {
     randomNumberCount: PropTypes.number.isRequired,
+    initialSeconds: PropTypes.number.isRequired,
   };
 
   state = {
     selectedIds: [],
+    remainingSeconds: this.props.initialSeconds,
   };
 
   randomNumbers = Array.from({
@@ -21,6 +23,25 @@ export default class Game extends Component {
     .reduce((acc, curr) => acc + curr, 0);
 
   //TODO: Shuffle the random numbers
+
+  componentDidMount() {
+    this.intervalId = setInterval(() => {
+      this.setState(
+        (prevState) => {
+          return {remainingSeconds: prevState.remainingSeconds - 1};
+        },
+        () => {
+          if (this.state.remainingSeconds === 0) {
+            clearInterval(this.intervalId);
+          }
+        }
+      );
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalId);
+  }
 
   isNumberSelected = (numberIndex) => {
     return this.state.selectedIds.indexOf(numberIndex) >= 0;
@@ -36,6 +57,10 @@ export default class Game extends Component {
     const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
       return acc + this.randomNumbers[curr];
     }, 0);
+
+    if (this.state.remainingSeconds === 0) {
+      return 'LOST';
+    }
 
     if (sumSelected < this.target) {
       return 'PLAYING';
@@ -68,6 +93,9 @@ export default class Game extends Component {
             />
           ))}
         </View>
+        <Text style={{marginBottom: 50, marginLeft: 50}}>
+          {this.state.remainingSeconds}
+        </Text>
       </View>
     );
   }

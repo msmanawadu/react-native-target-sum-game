@@ -3,6 +3,6 @@ import Game from './Game';
 
 export default class App extends Component {
   render() {
-    return <Game randomNumberCount={6} />;
+    return <Game randomNumberCount={6} initialSeconds={10} />;
   }
 }
