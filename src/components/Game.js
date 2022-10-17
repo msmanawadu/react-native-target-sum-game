@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, Button} from 'react-native';
 import RandomNumber from './RandomNumber';
+import shuffle from 'lodash.shuffle';
 
 export default class Game extends Component {
   static propTypes = {
     randomNumberCount: PropTypes.number.isRequired,
+    onPlayAgain: PropTypes.func.isRequired,
   };
 
   state = {
@@ -20,7 +22,7 @@ export default class Game extends Component {
     .slice(0, this.props.randomNumberCount - 2)
     .reduce((acc, curr) => acc + curr, 0);
 
-  //TODO: Shuffle the random numbers
+  shuffledRandomNumbers = shuffle(this.randomNumbers);
 
   isNumberSelected = (numberIndex) => {
     return this.state.selectedIds.indexOf(numberIndex) >= 0;
@@ -34,7 +36,7 @@ export default class Game extends Component {
 
   gameStatus = () => {
     const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
-      return acc + this.randomNumbers[curr];
+      return acc + this.shuffledRandomNumbers[curr];
     }, 0);
 
     if (sumSelected < this.target) {
@@ -56,7 +58,7 @@ export default class Game extends Component {
           {this.target}
         </Text>
         <View style={styles.randomContainer}>
-          {this.randomNumbers.map((randomNumber, index) => (
+          {this.shuffledRandomNumbers.map((randomNumber, index) => (
             <RandomNumber
               key={index}
               id={index}
@@ -68,6 +70,9 @@ export default class Game extends Component {
             />
           ))}
         </View>
+        {this.gameStatus() !== 'PLAYING' ? (
+          <Button title="Play Again" onPress={this.props.onPlayAgain}></Button>
+        ) : null}
       </View>
     );
   }
