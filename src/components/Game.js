@@ -64,13 +64,13 @@ export default class Game extends Component {
               id={index}
               number={randomNumber}
               isDisabled={
-                this.isNumberSelected(index) || this.gameStatus() !== 'PLAYING'
+                this.isNumberSelected(index) || gameStatus !== 'PLAYING'
               }
               onPress={this.selectNumber}
             />
           ))}
         </View>
-        {this.gameStatus() !== 'PLAYING' ? (
+        {this.gameStatus !== 'PLAYING' ? (
           <Button title="Play Again" onPress={this.props.onPlayAgain}></Button>
         ) : null}
       </View>
